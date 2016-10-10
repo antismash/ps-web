@@ -1,7 +1,7 @@
 plantiSMASH web interface
 =========================
 
-[![Build Status](http://bitbucket.drone.secondarymetabolites.org/api/badges/antismash/websmash/status.svg)](http://bitbucket.drone.secondarymetabolites.org/antismash/websmash)
+[![Build Status](http://github.drone.secondarymetabolites.org/api/badges/antismash/ps-web/status.svg)](http://github.drone.secondarymetabolites.org/antismash/ps-web)
 
 This is the web interface powering http://plantismash.secondarymetabolites.org/
 
