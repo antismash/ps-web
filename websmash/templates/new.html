@@ -1,5 +1,6 @@
 {% extends 'layout.html' %}
 {% block error_notices %}
+&nbsp;
 {% if error %}
 <div class="alert alert-error">
   <button type="button" class="close" data-dismiss="alert">&times;</button>
@@ -14,88 +15,93 @@
   <li><a href="#job" data-toggle="tab">Results for existing job</a></li>
 </ul>
 <div class="tab-content">
-  <div class="tab-pane active" id="nucl">
+  <div role="tabpanel" class="tab-pane active" id="nucl">
     <div>Search a genome sequence for secondary metabolite biosynthesis gene clusters:</div>
+    <div class="spacer"></div>
     <div>
-      <div class="control-group">
+      <div class="form-group">
         <button class="btn btn-inverse" id="dna-sample-input">Load sample input</button>
         <button class="btn btn-inverse" id="dna-sample-output">Open example output</button>
       </div>
-      <form class="form-vertical" method="POST" id="nucl-form" enctype="multipart/form-data">
+      <form class="form" method="POST" id="nucl-form" enctype="multipart/form-data">
         <fieldset class="as-form">
-          <div class="control-group">
-            <div class="controls">
-              <input type="email" name="email" id="email" value="{{old_email}}" placeholder="your.email@example.com">
-              <span class="help-inline">Email address (optional)</span>
+          <div class="form-group row">
+             <div class="col-md-3">
+              <input class="form-control" type="email" name="email" id="email" value="{{old_email}}" placeholder="your.email@example.com">
             </div>
+            <label class="col-md-2">Email address (optional)</label>
           </div>
-          <div class="control-group">
-            <div class="controls">
-              <input type="file" name="seq" id="seq">
-              <span class="help-inline">Load a file in GenBank / EMBL format (recommended) or in FASTA format</span>
+          <div class="form-group row">
+            <div class="col-md-3">
+              <input class="form-control" type="file" name="seq" id="seq">
             </div>
+            <label class="cold-md-4">Load a file in GenBank / EMBL format (recommended) or in FASTA format</label>
           </div>
-          <div class="control-group">
-            <div class="controls">
-              <input type="text" name="ncbi" id="ncbi" placeholder="NCBI ACC #">
-              <span class="help-inline">Or input NCBI accession number of desired file</span>
+          <div class="form-group row">
+            <div class="col-md-3">
+              <input class="form-control" type="text" name="ncbi" id="ncbi" placeholder="NCBI ACC #">
             </div>
+            <label class="col-md-4">Or input NCBI accession number of desired file</span>
           </div>
         </fieldset>
         <div id="region-control" data-toggle="collapse" data-target=".region">
-          <i class="icon-plus" id="region-button"></i>
+          <span class="glyphicon glyphicon-plus" id="region-button"></span>
           Limit prediction to an input region (ignored for multi-sequence records)
-          <a href="#" data-toggle="tooltip" data-placement="right" title="Set start/end coordinates for analysis"><i class="icon-question-sign"></i></a>
+          <a href="#" data-toggle="tooltip" data-placement="right" title="Set start/end coordinates for analysis"><span class="glyphicon glyphicon-question-sign"></span></a>
         </div>
-        <fieldset class="as-form collapse region">
-          <div class="controls collapse region">
-            <label for="from">Start at
-              <input type="text" name="from" id="from" placeholder="start at bp"></label>
+        <fieldset class="as-form">
+          <div class="form-group collapse region row">
+            <label for="from" class="col-md-1">Start at</label>
+            <div class="col-md-3">
+              <input class="form-control" type="text" name="from" id="from" placeholder="start at bp">
+            </div>
           </div>
-          <div class="controls collapse region">
-            <label for="to">Stop at
-              <input type="text" name="to" id="to" placeholder="stop at bp"></label>
+          <div class="form-group collapse region row">
+            <label class="col-md-1" for="to">Stop at</label>
+            <div class="col-md-3">
+              <input class="form-control" type="text" name="to" id="to" placeholder="stop at bp">
+            </div>
           </div>
         </fieldset>
         <div id="cf-control" data-toggle="collapse" data-target=".clusterfinder">
-          <i class="icon-plus" id="cf-button"></i>
+          <span class="glyphicon glyphicon-plus" id="cf-button"></span>
           Detect putative gene clusters using the
           <a target="_blank" href="http://www.cell.com/cell/abstract/S0092-8674(14)00826-5">ClusterFinder</a> algorithm
-          <a href="#" data-toggle="tooltip" data-placement="right" title="Selecting this makes the job go into the long runtime queue"><i class="icon-road"></i></a>
+          <a href="#" data-toggle="tooltip" data-placement="right" title="Selecting this makes the job go into the long runtime queue"><span class="glyphicon glyphicon-road"></span></a>
         </div>
-        <fieldset class="clusterfinder collapse as-form">
-          <div class="control clusterfinder collapse">
-            <label class="checkbox" for="inclusive">
-              <input type="checkbox" name="inclusive" id="inclusive">
-              Enable ClusterFinder algorithm</label>
-          </div>
-          <div class"control clusterfinder collapse">
-            For ClusterFinder-predicted clusters:
-          </div>
-          <div class="control clusterfinder collapse">
-            <label for="cf_cdsnr">Minimum cluster size in CDS
-              <input type="text" name="cf_cdsnr" id="cf_cdsnr" placeholder="5"></label>
-          </div>
-          <div class="control clusterfinder collapse">
-            <label for="cf_npfams">Minimum number of biosynthesis-related PFAM domains
-              <input type="text" name="cf_npfams" id="cf_npfams" placeholder="5"></label>
-          </div>
-          <div class="control clusterfinder collapse">
-            <label for="cf_threshold">Minimum ClusterFinder probability
-              <input type="text" name="cf_threshold" id="cf_threshold" placeholder="0.6"></label>
-          </div>
-        </fieldset>
         <fieldset class="as-form">
-          <div class="control-group">
-            <label class="checkbox" for="eukaryotic">
-              <input type="checkbox" name="eukaryotic" id="eukaryotic">
-              DNA of Eukaryotic origin
-              <span id="cassis-link"><br>If you are looking for NRPS/PKS clusters in Eukaryotes,
-                you might want to have a look at <a href="https://sbi.hki-jena.de/cassis">CASSIS</a>,
-                which nicely complements the antiSMASH predictions with a promotor-based search strategy.</span></label>
+          <div class="form-group clusterfinder collapse row">
+            <div class="col-md-3">
+              <label for="inclusive">
+                <input type="checkbox" name="inclusive" id="inclusive">
+                Enable ClusterFinder algorithm</label>
+            </div>
+          </div>
+          <div class="form-group clusterfinder collapse row">
+            <div class="col-md-6">
+              For ClusterFinder-predicted clusters:
+            </div>
+          </div>
+          <div class="form-group clusterfinder collapse row">
+            <label class="col-md-4" for="cf_cdsnr">Minimum cluster size in CDS</label>
+            <div class="col-md-1">
+                <input class="form-control" type="text" name="cf_cdsnr" id="cf_cdsnr" placeholder="5">
+            </div>
+          </div>
+          <div class="form-group clusterfinder collapse row">
+            <label class="col-md-4" for="cf_npfams">Minimum number of biosynthesis-related PFAM domains</label>
+            <div class="col-md-1">
+                <input class="form-control" type="text" name="cf_npfams" id="cf_npfams" placeholder="5">
+            </div>
+          </div>
+          <div class="from-group clusterfinder collapse row">
+            <label class="col-md-4" for="cf_threshold">Minimum ClusterFinder probability</label>
+            <div class="col-md-1">
+              <input class="form-control" type="text" name="cf_threshold" id="cf_threshold" placeholder="0.6">
+            </div>
           </div>
         </fieldset>
-        <fieldset class="control-group as-form dna_related">
+        <fieldset class="form-group as-form dna_related">
           <div>Gene finding options:</div>
           <div class="control">
             <label class="radio inline">
@@ -147,19 +153,19 @@
         <div>
           <strong>BLAST comparisons to other gene clusters:</strong>
         </div>
-        <fieldset class="control-group as-form">
-          <div class="control span4">
-            <label class="checkbox" for="clusterblast">
+        <fieldset class="form-group as-form">
+          <div class="col-md-4">
+            <label for="clusterblast">
               <input type="checkbox" name="clusterblast" id="clusterblast" checked>
               Gene Cluster Blast analysis</label>
           </div>
-          <div class="control span4">
-            <label class="checkbox" for="knownclusterblast">
+          <div class="col-md-4">
+            <label for="knownclusterblast">
               <input type="checkbox" name="knownclusterblast" id="knownclusterblast" checked>
               Known Gene Cluster Blast analysis</label>
           </div>
-          <div class="control span4">
-            <label class="checkbox" for="subclusterblast">
+          <div class="col-md-4">
+            <label for="subclusterblast">
               <input type="checkbox" name="subclusterblast" id="subclusterblast" checked>
               Subcluster Blast analysis</label>
           </div>
@@ -167,55 +173,56 @@
         <div>
           <strong>Additional annotations:</strong>
         </div>
-        <fieldset class="control-group as-form">
-          <div class="control span4">
-            <label class="checkbox" for="smcogs">
+        <fieldset class="form-group as-form">
+          <div class="col-md-4">
+            <label for="smcogs">
               <input type="checkbox" name="smcogs" id="smcogs" checked>
               smCOG analysis for functional prediction and phylogenetic analysis of genes</label>
           </div>
-          <div class="control span4">
-            <label class="checkbox" for="asf">
+          <div class="col-md-4">
+            <label for="asf">
               <input type="checkbox" name="asf" id="asf" checked>
               Active site finder</label>
           </div>
         </fieldset>
         <div id="longrun-control" data-toggle="collapse" data-target=".longrun">
-          <i class="icon-plus" id="region-button"></i>
+          <span class="glyphicon glyphicon-plus" id="longrun-button"></span>
           <strong>Optional analyses with a long runtime</strong>
-          <a href="#" data-toggle="tooltip" data-placement="right" title="Selecting any of these methods makes the job go into the long runtime queue"><i class="icon-road"></i></a>
+          <a href="#" data-toggle="tooltip" data-placement="right" title="Selecting any of these methods makes the job go into the long runtime queue"><span class="glyphicon glyphicon-road"></span></a>
         </div>
-        <fieldset class="control-group longrun collapse">
-          <div class="control">
-            <label class="checkbox" for="fullhmmer">
+        <fieldset class="form-group longrun collapse row">
+          <div class="col-md-6">
+            <label for="fullhmmer">
               <input type="checkbox" name="fullhmmer" id="fullhmmer">
               Whole-genome PFAM analysis</label>
           </div>
         </fieldset>
-        <fieldset class="control-group longrun collapse">
-          <div class="control">
-            <label class="checkbox" for="ecpred">
+        <fieldset class="form-group longrun collapse row">
+          <div class="col-md-6">
+            <label for="ecpred">
               <input type="checkbox" name="ecpred" id="ecpred">
               Enzyme Commission (EC) number prediction (very long runtime)</label>
           </div>
         </fieldset>
-        <fieldset class="control-group longrun collapse">
-          <div class="span6">
+        <fieldset class="form-group longrun collapse">
+          <div class="col-md-6">
             Homology based metabolic modeling pipeline against template model:
           </div>
-          <div class="control span6">
-            <label class="radio inline">
+          <div class="col-md-6">
+            <label class="radio-inline">
               <input type="radio" name="modeling" id="modeling_none" value="none" checked>
               none</label>
-            <label class="radio inline">
+            <label class="radio-inline">
               <input type="radio" name="modeling" id="modeling_eco" value="eco">
               <i>E. coli</i></label>
-            <label class="radio inline">
+            <label class="radio-inline">
               <input type="radio" name="modeling" id="modeling_sco" value="sco">
               <i>S. coelicolor</i></label>
           </div>
           <span class="help-block">Requires EC number predictions</span>
         </fieldset>
-        <div class="form-actions">
+        <div class="spacer"></div>
+        <div class="well">
           <button type="submit" class="btn btn-primary">Submit</button>
         </div>
       </form>
@@ -224,12 +231,12 @@
   <div class="tab-pane" id="prot">
     <div>Analyze one or more amino acid sequences to identify secondary metabolite scaffold biosynthesis genes:</div>
     <div>
-      <div class="control-group">
+      <div class="form-group">
         <button class="btn btn-inverse" id="prot-sample-input">Load sample input</button>
         <button class="btn btn-inverse" id="prot-sample-output">Open example output</button>
       </div>
       <form action="{{ url_for('protein') }}" id="prot-form" method="POST">
-        <div class="control-group">
+        <div class="form-group">
           <div class="controls">
             <input type="email" name="email" id="email" value="{{old_email}}" placeholder="your.email@example.com">
             <span class="help-inline">Email address (optional)</span>
@@ -246,13 +253,13 @@
         <div>
           <strong>Additional annotations:</strong>
         </div>
-        <fieldset class="control-group">
-          <div class="control span4">
+        <fieldset class="form-group">
+          <div class="control col-md-4">
             <label class="checkbox" for="smcogs">
               <input type="checkbox" name="smcogs" id="smcogs" checked>
               smCOG analysis for functional prediction and phylogenetic analysis of genes</label>
           </div>
-          <div class="control span4">
+          <div class="control col-md-4">
             <label class="checkbox" for="asf">
               <input type="checkbox" name="asf" id="asf" checked>
               Active site finder</label>
@@ -292,15 +299,6 @@
         window.open('/upload/prot_example/index.html', '_self');
     });
 
-    // Allow the 'all' checkbox to toggle all other clusters
-    $('#cluster_1').change(toggle_clusters);
-    $('#cluster_1').prop('checked', 'checked');
-    toggle_clusters();
-
-    // disable new options for legacy antismash1 jobs
-    $('#legacy').change(toggle_legacy);
-    toggle_legacy();
-
     // Show genefinding options if user is trying to upload a fasta file
     $('#eukaryotic').change(show_genefinding_if_needed);
     $('input[name=genefinder]').change(show_genefinding_if_needed);
@@ -318,35 +316,23 @@
 
     show_genefinding_if_needed();
 
-    $('.legacy-options').on('shown', function(){
-        $('#legacy-button').removeClass('icon-plus')
-            .addClass('icon-minus');
-        $('#legacy-description').text('Hide');
+    $('.region').on('show.bs.collapse', function(){
+        $('#region-button').removeClass('glyphicon-plus')
+            .addClass('glyphicon-minus');
     })
-    .on('hidden', function() {
-        $('#legacy-button').removeClass('icon-minus')
-            .addClass('icon-plus');
-        $('#legacy-description').text('Show');
+    .on('hide.bs.collapse', function() {
+        $('#region-button').removeClass('glyphicon-minus')
+            .addClass('glyphicon-plus');
     });
 
-    $('.region').on('shown', function(){
-        $('#region-button').removeClass('icon-plus')
-            .addClass('icon-minus');
+    $('.longrun').on('show.bs.collapse', function(){
+        $('#longrun-button').removeClass('glyphicon-plus')
+            .addClass('glyphicon-minus');
     })
-    .on('hidden', function() {
-        $('#region-button').removeClass('icon-minus')
-            .addClass('icon-plus');
+    .on('hide.bs.collapse', function() {
+        $('#longrun-button').removeClass('glyphicon-minus')
+            .addClass('glyphicon-plus');
     });
-
-    $('.sec-met').on('shown', function(){
-        $('#sec-met-button').removeClass('icon-plus')
-            .addClass('icon-minus');
-    })
-    .on('hidden', function() {
-        $('#sec-met-button').removeClass('icon-minus')
-            .addClass('icon-plus');
-    });
-    $('a[data-toggle="tooltip"]').tooltip();
 
     $('#display-job').click(function(){
         var jobid = $('#jobid').val();

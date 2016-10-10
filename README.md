@@ -1,9 +1,9 @@
-antiSMASH web interface
-=======================
+plantiSMASH web interface
+=========================
 
 [![Build Status](http://bitbucket.drone.secondarymetabolites.org/api/badges/antismash/websmash/status.svg)](http://bitbucket.drone.secondarymetabolites.org/antismash/websmash)
 
-This is the web interface powering http://antismash.secondarymetabolites.org/
+This is the web interface powering http://plantismash.secondarymetabolites.org/
 
 Installation
 ------------
@@ -22,7 +22,7 @@ First, create a settings.cfg file:
 DEBUG = False
 SECRET_KEY = "Better put a proper secret here"
 # Path to antiSMASH output directory on disk
-RESULTS_PATH = '/data/antismash/upload'
+RESULTS_PATH = '/data/plantismash/upload'
 # URL path to antiSMASH results in the webapp
 RESULTS_URL = '/upload'
 
@@ -35,7 +35,7 @@ REDIS_URL = 'redis://your.redis.database:port/number'
 
 # Flask-Downloader settings
 # This should be the same as RESULTS_PATH
-DEFAULT_DOWNLOAD_DIR = '/data/antismash/upload'
+DEFAULT_DOWNLOAD_DIR = '/data/plantismash/upload'
 
 # Content NCBI likes to return when reading from NCBI fails.
 BAD_CONTENT = ('Error reading from remote server', 'Bad gateway', 'Cannot process ID list', 'server is temporarily unable to service your request', 'Service unavailable', 'Server Error')

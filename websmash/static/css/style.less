@@ -1,24 +1,33 @@
 @antismash-red: #810e15;
+@antismash-green: #409000;
 @medium-gray: #444;
 @light-gray: #eee;
 @light-red: #aa0000;
 
 .icons {
     margin-top: 1em;
+    img {
+        margin-left: 5px;
+    }
 }
 
 .as-icon-active {
     box-shadow: 0 3px 6px fadeout(white, 40%), inset 0 -3px 3px fadeout(white, 60%);
 }
 
+.as-logo {
+    margin-top: 5px;
+    max-width: 114px;
+}
+
 .line-bottom(@width: 2px) {
     padding-bottom: 0.25em;
-    border-bottom: @width solid @light-red;
+    border-bottom: @width solid @antismash-green;
 }
 
 .line-top(@width: 2px) {
     padding-top: 0.25em;
-    border-top: @width solid @light-red;
+    border-top: @width solid @antismash-green;
 }
 
 .header {
@@ -28,6 +37,11 @@
 
 .footer {
     .line-top(1px);
+}
+
+
+.nav.nav-tabs {
+    margin-bottom: 20px;
 }
 
 .antismash-title {
@@ -47,9 +61,7 @@
 .org-logos {
     margin-top: 1em;
     img {
-        padding-right: 5px;
-        // Width should be 100 / (# logos) - 2
-        width: 60%;
+        padding-right: 10px;
     }
     tr td {
        height: 50px;
@@ -73,5 +85,14 @@
 
 .as-form {
     padding-top: 0.5em;
-    border-bottom: 1px solid @light-red;
+    padding-bottom: 0.5em;
+    border-bottom: 1px solid @antismash-green;
+}
+
+.form-group {
+    margin-bottom: 10px;
+}
+
+.spacer {
+    margin-top: 1em;
 }
