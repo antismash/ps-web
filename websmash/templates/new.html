@@ -11,261 +11,100 @@
 {% block body %}
 <ul class="nav nav-tabs">
   <li class="active"><a href="#nucl" data-toggle="tab">Nucleotide input</a></li>
-  <li><a href="#prot" data-toggle="tab">Protein input</a></li>
+  <li><a href="#">Precalculated Results</a></li>
   <li><a href="#job" data-toggle="tab">Results for existing job</a></li>
 </ul>
 <div class="tab-content">
   <div role="tabpanel" class="tab-pane active" id="nucl">
-    <div>Search a genome sequence for secondary metabolite biosynthesis gene clusters:</div>
+    <div>Search plant genome sequence for secondary metabolite biosynthesis gene clusters:</div>
     <div class="spacer"></div>
     <div>
-      <div class="form-group">
-        <button class="btn btn-inverse" id="dna-sample-input">Load sample input</button>
-        <button class="btn btn-inverse" id="dna-sample-output">Open example output</button>
-      </div>
       <form class="form" method="POST" id="nucl-form" enctype="multipart/form-data">
         <fieldset class="as-form">
           <div class="form-group row">
-             <div class="col-md-3">
-              <input class="form-control" type="email" name="email" id="email" value="{{old_email}}" placeholder="your.email@example.com">
+             <div class="col-md-5">
+              <input class="form-control" type="email" name="email" id="email" value="" placeholder="your.email@example.com">
             </div>
-            <label class="col-md-2">Email address (optional)</label>
+            <label class="col-md-4">Email address (optional)</label>
           </div>
           <div class="form-group row">
-            <div class="col-md-3">
+            <div class="col-md-5">
               <input class="form-control" type="file" name="seq" id="seq">
             </div>
-            <label class="cold-md-4">Load a file in GenBank / EMBL format (recommended) or in FASTA format</label>
+            <label class="col-md-6">Load a file in GenBank / EMBL format (recommended) or in FASTA format</label>
+          </div>
+          <div class="form-group row" style="display: none;" id="gff-row">
+            <div class="col-md-5">
+              <input class="form-control" type="file" name="gff" id="gff">
+            </div>
+            <label class="col-md-6">Annotation file in GFF3 format (optional)</label>
           </div>
           <div class="form-group row">
-            <div class="col-md-3">
+            <div class="col-md-5">
               <input class="form-control" type="text" name="ncbi" id="ncbi" placeholder="NCBI ACC #">
             </div>
-            <label class="col-md-4">Or input NCBI accession number of desired file</span>
+            <label class="col-md-6">or input NCBI accession number of desired file</label>
           </div>
         </fieldset>
-        <div id="region-control" data-toggle="collapse" data-target=".region">
-          <span class="glyphicon glyphicon-plus" id="region-button"></span>
-          Limit prediction to an input region (ignored for multi-sequence records)
-          <a href="#" data-toggle="tooltip" data-placement="right" title="Set start/end coordinates for analysis"><span class="glyphicon glyphicon-question-sign"></span></a>
-        </div>
         <fieldset class="as-form">
-          <div class="form-group collapse region row">
-            <label for="from" class="col-md-1">Start at</label>
-            <div class="col-md-3">
-              <input class="form-control" type="text" name="from" id="from" placeholder="start at bp">
-            </div>
+          <div style="margin-top: 0.5em;">
+            <strong>Additional analysis:</strong>
+            <a href="#" data-toggle="tooltip" data-placement="right" title="Every options selected might increase the analysis runtime"><span class="glyphicon glyphicon-question-sign"></span></a>
           </div>
-          <div class="form-group collapse region row">
-            <label class="col-md-1" for="to">Stop at</label>
-            <div class="col-md-3">
-              <input class="form-control" type="text" name="to" id="to" placeholder="stop at bp">
-            </div>
+          <div id="clusterblast-control" data-toggle="collapse" data-target=".clusterblast" style="margin-top: 0.5em;">
+            <span class="glyphicon glyphicon-plus" id="clusterblast-button"></span>
+            Gene cluster comparative analysis (ClusterBlast):
           </div>
-        </fieldset>
-        <div id="cf-control" data-toggle="collapse" data-target=".clusterfinder">
-          <span class="glyphicon glyphicon-plus" id="cf-button"></span>
-          Detect putative gene clusters using the
-          <a target="_blank" href="http://www.cell.com/cell/abstract/S0092-8674(14)00826-5">ClusterFinder</a> algorithm
-          <a href="#" data-toggle="tooltip" data-placement="right" title="Selecting this makes the job go into the long runtime queue"><span class="glyphicon glyphicon-road"></span></a>
-        </div>
-        <fieldset class="as-form">
-          <div class="form-group clusterfinder collapse row">
-            <div class="col-md-3">
-              <label for="inclusive">
-                <input type="checkbox" name="inclusive" id="inclusive">
-                Enable ClusterFinder algorithm</label>
+          <div class="form-group collapse clusterblast row">
+            <div class="col-md-5">
+              <label for="clusterblast">
+                <input type="checkbox" name="clusterblast" id="clusterblast">
+                Compare to plantiSMASH predicted clusters</label>
             </div>
-          </div>
-          <div class="form-group clusterfinder collapse row">
             <div class="col-md-6">
-              For ClusterFinder-predicted clusters:
+              <label for="knownclusterblast">
+                <input type="checkbox" name="knownclusterblast" id="knownclusterblast">
+                Compare to registered known clusters from MIBiG Database</label>
             </div>
           </div>
-          <div class="form-group clusterfinder collapse row">
-            <label class="col-md-4" for="cf_cdsnr">Minimum cluster size in CDS</label>
-            <div class="col-md-1">
-                <input class="form-control" type="text" name="cf_cdsnr" id="cf_cdsnr" placeholder="5">
-            </div>
+          <div id="coexpress-control" data-toggle="collapse" data-target=".coexpress" style="margin-top: 0.5em;">
+            <span class="glyphicon glyphicon-plus" id="coexpress-button"></span>
+            Gene expression analysis (CoExpress):
           </div>
-          <div class="form-group clusterfinder collapse row">
-            <label class="col-md-4" for="cf_npfams">Minimum number of biosynthesis-related PFAM domains</label>
-            <div class="col-md-1">
-                <input class="form-control" type="text" name="cf_npfams" id="cf_npfams" placeholder="5">
+          <div class="form-group collapse coexpress row">
+            <div class="col-md-5">
+              <input class="form-control" type="file" name="coexpress_file" id="coexpress_file">
             </div>
+            <label class="col-md-6">Load a <a href="#">Gene Expression Omnibus (GEO)</a> SOFT file or a <a href="#">properly formatted</a> CSV file</label>
           </div>
-          <div class="from-group clusterfinder collapse row">
-            <label class="col-md-4" for="cf_threshold">Minimum ClusterFinder probability</label>
-            <div class="col-md-1">
-              <input class="form-control" type="text" name="cf_threshold" id="cf_threshold" placeholder="0.6">
+        </fieldset>
+        <fieldset class="as-form">
+          <div style="margin-top: 0.5em;">
+            <strong>Advanced options:</strong>
+          </div>
+          <div id="advanced-control" data-toggle="collapse" data-target=".advanced" style="margin-top: 0.5em;">
+            <span class="glyphicon glyphicon-plus" id="advanced-button"></span>
+            Show advanced options
+          </div>
+          <div class="collapse advanced">
+            <br>
+            <div class="form-group row">
+              <div class="col-md-3">CD-HIT Cutoff</div>
+              <div class="col-md-8">: <input type="text" name="cdh_cutoff" id="cdh_cutoff" size="2" value="0.5" style="text-align: right;"> (default: 0.5)</div>
+            </div>
+            <div class="form-group row">
+              <div class="col-md-3">Minimum unique domains</div>
+              <div class="col-md-8">: <input type="text" name="min_domain" id="min_domain" size="2" value="2" style="text-align: right;"> (default: 2)</div>
+            </div>
+            <div class="form-group row">
+              <div class="col-md-3">MAD Cutoff (CoExpress)</div>
+              <div class="col-md-8">: <input type="text" name="coexpress_mad" id="coexpress_mad" size="2" value="" style="text-align: right;"> (default: not set; only filter out genes with 0 MAD)</div>
             </div>
           </div>
         </fieldset>
-        <fieldset class="form-group as-form dna_related">
-          <div>Gene finding options:</div>
-          <div class="control">
-            <label class="radio inline">
-              <input type="radio" name="genefinder" id="prodigal" value="prodigal" checked>
-              Prodigal
-            </label>
-            <label class="radio inline">
-              <input type="radio" name="genefinder" id="prodigal_m" value="prodigal_m">
-              Prodigal (draft genomes / metagenomes)
-            </label>
-            <label class="radio inline">
-              <input type="radio" name="genefinder" id="glimmer" value="glimmer">
-              Glimmer
-            </label>
-          </div>
-          <div class="control glimmer">
-            <label class="control-label" for="trans_table">GenBank translation table used for Glimmer:</label>
-            <select id="trans_table" name="trans_table">
-              <option value="1"> The Standard Code</option>
-              <option value="11"> The Bacterial, Archaeal and Plant Plastid Code</option>
-              <option value="10"> The Euplotid Nuclear Code</option>
-              <option value="13"> The Ascidian Mitochondrial Code</option>
-              <option value="12"> The Alternative Yeast Nuclear Code</option>
-              <option value="15"> Blepharisma Nuclear Code</option>
-              <option value="14"> The Alternative Flatworm Mitochondrial Code</option>
-              <option value="22"> Scenedesmus Obliquus Mitochondrial Code</option>
-              <option value="16"> Chlorophycean Mitochondrial Code</option>
-              <option value="23"> Thraustochytrium Mitochondrial Code</option>
-              <option value="3"> The Yeast Mitochondrial Code</option>
-              <option value="2"> The Vertebrate Mitochondrial Code</option>
-              <option value="5"> The Invertebrate Mitochondrial Code</option>
-              <option value="4"> The Mold, Protozoan, and Coelenterate Mitochondrial Code and the Mycoplasma/Spiroplasma Code</option>
-              <option value="6"> The Ciliate, Dasycladacean and Hexamita Nuclear Code</option>
-              <option value="9"> The Echinoderm and Flatworm Mitochondrial Code</option>
-              <option value="21"> Trematode Mitochondrial Code</option>
-            </select>
-          </div>
-          <div class="control glimmer">
-            <input type="text" name="gene_length" id="gene_length" value="50">
-            <span class="help-inline">Glimmer minimal gene length</span>
-          </div>
-          <div class="control">
-            <label class="checkbox" for="all_orfs">
-              <input type="checkbox" name="all_orfs" id="all_orfs" checked>
-              Run secondary metabolite detection on all possible ORFs</label>
-            </div>
 
-        </fieldset>
-        <div>
-          <strong>BLAST comparisons to other gene clusters:</strong>
-        </div>
-        <fieldset class="form-group as-form">
-          <div class="col-md-4">
-            <label for="clusterblast">
-              <input type="checkbox" name="clusterblast" id="clusterblast" checked>
-              Gene Cluster Blast analysis</label>
-          </div>
-          <div class="col-md-4">
-            <label for="knownclusterblast">
-              <input type="checkbox" name="knownclusterblast" id="knownclusterblast" checked>
-              Known Gene Cluster Blast analysis</label>
-          </div>
-          <div class="col-md-4">
-            <label for="subclusterblast">
-              <input type="checkbox" name="subclusterblast" id="subclusterblast" checked>
-              Subcluster Blast analysis</label>
-          </div>
-        </fieldset>
-        <div>
-          <strong>Additional annotations:</strong>
-        </div>
-        <fieldset class="form-group as-form">
-          <div class="col-md-4">
-            <label for="smcogs">
-              <input type="checkbox" name="smcogs" id="smcogs" checked>
-              smCOG analysis for functional prediction and phylogenetic analysis of genes</label>
-          </div>
-          <div class="col-md-4">
-            <label for="asf">
-              <input type="checkbox" name="asf" id="asf" checked>
-              Active site finder</label>
-          </div>
-        </fieldset>
-        <div id="longrun-control" data-toggle="collapse" data-target=".longrun">
-          <span class="glyphicon glyphicon-plus" id="longrun-button"></span>
-          <strong>Optional analyses with a long runtime</strong>
-          <a href="#" data-toggle="tooltip" data-placement="right" title="Selecting any of these methods makes the job go into the long runtime queue"><span class="glyphicon glyphicon-road"></span></a>
-        </div>
-        <fieldset class="form-group longrun collapse row">
-          <div class="col-md-6">
-            <label for="fullhmmer">
-              <input type="checkbox" name="fullhmmer" id="fullhmmer">
-              Whole-genome PFAM analysis</label>
-          </div>
-        </fieldset>
-        <fieldset class="form-group longrun collapse row">
-          <div class="col-md-6">
-            <label for="ecpred">
-              <input type="checkbox" name="ecpred" id="ecpred">
-              Enzyme Commission (EC) number prediction (very long runtime)</label>
-          </div>
-        </fieldset>
-        <fieldset class="form-group longrun collapse">
-          <div class="col-md-6">
-            Homology based metabolic modeling pipeline against template model:
-          </div>
-          <div class="col-md-6">
-            <label class="radio-inline">
-              <input type="radio" name="modeling" id="modeling_none" value="none" checked>
-              none</label>
-            <label class="radio-inline">
-              <input type="radio" name="modeling" id="modeling_eco" value="eco">
-              <i>E. coli</i></label>
-            <label class="radio-inline">
-              <input type="radio" name="modeling" id="modeling_sco" value="sco">
-              <i>S. coelicolor</i></label>
-          </div>
-          <span class="help-block">Requires EC number predictions</span>
-        </fieldset>
         <div class="spacer"></div>
         <div class="well">
-          <button type="submit" class="btn btn-primary">Submit</button>
-        </div>
-      </form>
-    </div>
-  </div>
-  <div class="tab-pane" id="prot">
-    <div>Analyze one or more amino acid sequences to identify secondary metabolite scaffold biosynthesis genes:</div>
-    <div>
-      <div class="form-group">
-        <button class="btn btn-inverse" id="prot-sample-input">Load sample input</button>
-        <button class="btn btn-inverse" id="prot-sample-output">Open example output</button>
-      </div>
-      <form action="{{ url_for('protein') }}" id="prot-form" method="POST">
-        <div class="form-group">
-          <div class="controls">
-            <input type="email" name="email" id="email" value="{{old_email}}" placeholder="your.email@example.com">
-            <span class="help-inline">Email address (optional)</span>
-          </div>
-          <div class="controls">
-            <input type="text" name="prot-ncbi" id="prot-ncbi" placeholder="NCBI ACC #">
-            <span class="help-inline">Input (comma-separated) NCBI accession number(s) of desired protein(s)</span>
-          </div>
-          <div class="controls">
-            <label for="sequence">or paste a FASTA amino acid sequence here:</label>
-            <textarea name="sequence" id="sequence" rows="10" class="input-block-level" >{{old_sequence}}</textarea>
-          </div>
-        </div>
-        <div>
-          <strong>Additional annotations:</strong>
-        </div>
-        <fieldset class="form-group">
-          <div class="control col-md-4">
-            <label class="checkbox" for="smcogs">
-              <input type="checkbox" name="smcogs" id="smcogs" checked>
-              smCOG analysis for functional prediction and phylogenetic analysis of genes</label>
-          </div>
-          <div class="control col-md-4">
-            <label class="checkbox" for="asf">
-              <input type="checkbox" name="asf" id="asf" checked>
-              Active site finder</label>
-          </div>
-        </fieldset>
-        <div class="form-actions">
           <button type="submit" class="btn btn-primary">Submit</button>
         </div>
       </form>
@@ -283,56 +122,37 @@
 </div>
 {% endblock %}
 {% block ready_function %}
-    // Set up button actions
-    $('#dna-sample-input').click(function(){
-        $('#ncbi').val('Y16952');
-        clear_upload();
-    });
-    $('#dna-sample-output').click(function(){
-        window.open('/upload/example/index.html', '_self');
-    });
-    $('#prot-sample-input').click(function(){
-        $('#prot-ncbi').val('ADJ56352.1,ADJ56353.1');
-        clear_sequence();
-    });
-    $('#prot-sample-output').click(function(){
-        window.open('/upload/prot_example/index.html', '_self');
-    });
-
-    // Show genefinding options if user is trying to upload a fasta file
-    $('#eukaryotic').change(show_genefinding_if_needed);
-    $('input[name=genefinder]').change(show_genefinding_if_needed);
-
     // Make sure that only NCBI accession# or uploadable file is present.
     $('#seq').change(seq_callback);
     $('#ncbi').change(clear_upload);
 
-    $('#sequence').change(clear_prot_ncbi);
-    $('#prot-ncbi').change(clear_sequence);
-
-    // Show CASSIS link for Eukaryotic inputs
-    $('#eukaryotic').change(toggle_cassis_tip);
-    toggle_cassis_tip();
-
-    show_genefinding_if_needed();
-
-    $('.region').on('show.bs.collapse', function(){
-        $('#region-button').removeClass('glyphicon-plus')
+    $('.clusterblast').on('show.bs.collapse', function(){
+        $('#clusterblast-button').removeClass('glyphicon-plus')
             .addClass('glyphicon-minus');
     })
     .on('hide.bs.collapse', function() {
-        $('#region-button').removeClass('glyphicon-minus')
+        $('#clusterblast-button').removeClass('glyphicon-minus')
             .addClass('glyphicon-plus');
     });
 
-    $('.longrun').on('show.bs.collapse', function(){
-        $('#longrun-button').removeClass('glyphicon-plus')
+    $('.coexpress').on('show.bs.collapse', function(){
+        $('#coexpress-button').removeClass('glyphicon-plus')
             .addClass('glyphicon-minus');
     })
     .on('hide.bs.collapse', function() {
-        $('#longrun-button').removeClass('glyphicon-minus')
+        $('#coexpress-button').removeClass('glyphicon-minus')
             .addClass('glyphicon-plus');
     });
+
+    $('.advanced').on('show.bs.collapse', function(){
+        $('#advanced-button').removeClass('glyphicon-plus')
+            .addClass('glyphicon-minus');
+    })
+    .on('hide.bs.collapse', function() {
+        $('#advanced-button').removeClass('glyphicon-minus')
+            .addClass('glyphicon-plus');
+    });
+
 
     $('#display-job').click(function(){
         var jobid = $('#jobid').val();
@@ -345,5 +165,4 @@
     {% endif %}
 
     $('#nucl-form').submit(verify_nucl_form);
-    $('#prot-form').submit(verify_prot_form);
 {% endblock %}
