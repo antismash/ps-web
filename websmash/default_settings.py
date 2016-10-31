@@ -6,9 +6,9 @@ RESULTS_PATH = path.join(path.dirname(path.dirname(__file__)), 'results')
 RESULTS_URL = '/upload'
 
 # Flask-Mail settings
-MAIL_SERVER = "smtpserv.uni-tuebingen.de"
-DEFAULT_MAIL_SENDER = "kai.blin@biotech.uni-tuebingen.de"
-DEFAULT_RECIPIENTS = ["kai.blin@biotech.uni-tuebingen.de"]
+MAIL_SERVER = "mail.example.org"
+DEFAULT_MAIL_SENDER = "alice@example.org"
+DEFAULT_RECIPIENTS = ["bob@example.org"]
 
 # Flask-Redis settings
 REDIS_URL = "redis://localhost:6379/0"
