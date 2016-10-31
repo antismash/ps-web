@@ -95,7 +95,15 @@ function show_glimmer_if_needed(fasta, euc) {
 
 function seq_callback() {
     clear_ncbi();
-    show_genefinding_if_needed();
+    show_gff_upload_if_unannotated();
+}
+
+function show_gff_upload_if_unannotated() {
+  var display = "none";
+  if (get_ext($('#seq').val().toLowerCase()).length > 0) {
+    display = "";
+  }
+  $('#gff-row').css("display", display);
 }
 
 function show_genefinding() {
@@ -174,8 +182,6 @@ function getFileSize() {
 function verify_nucl_form() {
     var file = $('#seq').val();
     var ncbi = $('#ncbi').val();
-    var from = $('#from').val();
-    var to = $('#to').val();
 
     if( (file === '' || file === null) && (ncbi === '' || ncbi === null)){
         alert('No input file provided. Please enter NCBI number or upload your own file');
@@ -184,21 +190,6 @@ function verify_nucl_form() {
 
     if( !(is_annotated(file) || is_fasta(file)) && ncbi === '' ) {
         alert('Please provide EMBL/GenBank or nucleotide FASTA file');
-        return false;
-    }
-
-    if((! $.isNumeric(from)) && (! (from === '' && to === ''))){
-        alert("Please insert an integer number into the 'from' field.");
-        return false;
-    }
-
-    if((! $.isNumeric(to)) && (! (to === '' && to === ''))){
-        alert("Please insert an integer number into the 'to' field.");
-        return false;
-    }
-
-    if(parseInt(from, 10) > parseInt(to, 10)){
-        alert("Value in 'to' field should be higher than value in 'from' field.");
         return false;
     }
 
