@@ -12,12 +12,7 @@ def _submit_job(redis_store, job):
     """Submit a new job"""
     redis_store.hmset(u'job:%s' % job.uid, job.get_dict())
 
-    # put the really time-consuming jobs in an extra-queue
-    if job.inclusive or job.fullhmm or job.ecpred or \
-       job.modeling != u"none":
-        queue = "jobs:timeconsuming"
-    else:
-        queue = "jobs:queued"
+    queue = "jobs:queued"
 
     redis_store.lpush(queue, job.uid)
 
@@ -33,55 +28,27 @@ def new():
             kwargs['ncbi'] = request.form.get('ncbi', '').strip()
             kwargs['email'] = request.form.get('email', '').strip()
             old_email = kwargs['email']
-            kwargs['from'] = request.form.get('from', '').strip()
-            kwargs['to'] = request.form.get('to', '').strip()
-            legacy = request.form.get('legacy', u'off')
-            if legacy == u'on':
-                raise Exception('Sorry, but running antiSMASH 1 is no longer supported')
-            eukaryotic = request.form.get('eukaryotic', u'off')
-            all_orfs = request.form.get('all_orfs', u'off')
-            smcogs = request.form.get('smcogs', u'off')
+
+            # This webapi is for plantiSMASH, so create plantiSMASH jobs
+            kwargs['jobtype'] = 'plantismash'
+
             clusterblast = request.form.get('clusterblast', u'off')
             knownclusterblast = request.form.get('knownclusterblast', u'off')
             subclusterblast = request.form.get('subclusterblast', u'off')
             fullhmmer = request.form.get('fullhmmer', u'off')
+            coexpress_mad = request.form.get('coexpress_mad', u'')
 
-            kwargs['genefinder'] = request.form.get('genefinder', 'prodigal')
-            kwargs['trans_table'] = request.form.get('trans_table', 1, type=int)
-            kwargs['gene_length'] = request.form.get('gene_length', 50, type=int)
-            kwargs['from'] = request.form.get('from', 0, type=int)
-            kwargs['to'] = request.form.get('to', 0, type=int)
-
-            inclusive = request.form.get('inclusive', u'off')
-            kwargs['inclusive'] = (inclusive == u'on')
-            kwargs['cf_cdsnr'] = request.form.get('cf_cdsnr', 5, type=int)
-            kwargs['cf_npfams'] = request.form.get('cf_npfams', 5, type=int)
-            kwargs['cf_threshold'] = request.form.get('cf_threshold', 0.6, type=float)
-
-            asf = request.form.get('asf', u'off')
-            ecpred = request.form.get('ecpred', u'off')
-            kwargs['modeling'] = request.form.get('modeling', u'none')
-
-            # Always predict all sec met types
-            kwargs['geneclustertypes'] = "1"
-
-            # given that we only support antismash 3 at the moment, hardcode
-            # that jobtype.
-            kwargs['jobtype'] = 'antismash3'
+            kwargs['cdh_cutoff'] = request.form.get('cdh_cutoff', 0.5, type=float)
+            kwargs['min_domain_number'] = request.form.get('min_domain_number', 2, type=int)
 
             # Use boolean values instead of "on/off" strings
-            kwargs['eukaryotic'] = (eukaryotic == u'on')
-            kwargs['smcogs'] = (smcogs == u'on')
             kwargs['clusterblast'] = (clusterblast == u'on')
             kwargs['knownclusterblast'] = (knownclusterblast == u'on')
-            kwargs['subclusterblast'] = (subclusterblast == u'on')
-            kwargs['fullhmm'] = (fullhmmer == u'on')
-            kwargs['asf'] = (asf == u'on')
-            kwargs['ecpred'] = (ecpred == u'on')
-            kwargs['all_orfs'] = (all_orfs == u'on')
 
-            # Never run full-genome blast analysis
-            kwargs['fullblast'] = False
+            try:
+                kwargs['min_mad'] = int(coexpress_mad)
+            except ValueError:
+                pass
 
             job = Job(**kwargs)
             dirname = path.join(app.config['RESULTS_PATH'], job.uid)
@@ -101,6 +68,33 @@ def new():
                     job.filename = filename
                 else:
                     raise Exception("Uploading input file failed!")
+
+
+            gff = request.files['gff']
+            if gff is not None and gff.filename != '':
+                filename = secure_filename(gff.filename)
+                gff.save(path.join(dirname, filename))
+                if not path.exists(path.join(dirname, filename)):
+                    raise Exception("Could not save file!")
+                job.gff3 = filename
+
+            coexpress_file = request.files['coexpress_file']
+            if coexpress_file is not None and coexpress_file.filename != '':
+                filename = secure_filename(coexpress_file.filename)
+                coexpress_file.save(path.join(dirname, filename))
+                if not path.exists(path.join(dirname, filename)):
+                    raise Exception("Could not save file!")
+
+                job.coexpress = True
+
+                _, ext = path.splitext(filename)
+                if ext.lower() == '.soft':
+                    job.soft_file = filename
+                elif ext.lower() == '.csv':
+                    job.csv_file = filename
+                else:
+                    job.coexpress = False
+
 
             _submit_job(redis_store, job)
             return redirect(url_for('.display', task_id=job.uid))

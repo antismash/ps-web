@@ -42,6 +42,10 @@ class Job(object):
         self.status = kwargs.get('status', 'pending')
         self.dispatcher = kwargs.get('dispatcher', 'unknown')
         self.download = kwargs.get('download', '')
+        self.cdh_cutoff = kwargs.get('cdh_cutoff', 0.5)
+        self.min_domain_number = kwargs.get('min_domain_number', 2)
+        if 'min_mad' in kwargs:
+            self.min_mad = kwargs['min_mad']
 
     def get_short_status(self):
         """Get a short status description useful for icon names"""
