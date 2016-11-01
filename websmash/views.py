@@ -70,30 +70,32 @@ def new():
                     raise Exception("Uploading input file failed!")
 
 
-            gff = request.files['gff']
-            if gff is not None and gff.filename != '':
-                filename = secure_filename(gff.filename)
-                gff.save(path.join(dirname, filename))
-                if not path.exists(path.join(dirname, filename)):
-                    raise Exception("Could not save file!")
-                job.gff3 = filename
+            if 'gff' in request.files:
+                gff = request.files['gff']
+                if gff is not None and gff.filename != '':
+                    filename = secure_filename(gff.filename)
+                    gff.save(path.join(dirname, filename))
+                    if not path.exists(path.join(dirname, filename)):
+                        raise Exception("Could not save file!")
+                    job.gff3 = filename
 
-            coexpress_file = request.files['coexpress_file']
-            if coexpress_file is not None and coexpress_file.filename != '':
-                filename = secure_filename(coexpress_file.filename)
-                coexpress_file.save(path.join(dirname, filename))
-                if not path.exists(path.join(dirname, filename)):
-                    raise Exception("Could not save file!")
+            if 'coexpress_file' in request.files:
+                coexpress_file = request.files['coexpress_file']
+                if coexpress_file is not None and coexpress_file.filename != '':
+                    filename = secure_filename(coexpress_file.filename)
+                    coexpress_file.save(path.join(dirname, filename))
+                    if not path.exists(path.join(dirname, filename)):
+                        raise Exception("Could not save file!")
 
-                job.coexpress = True
+                    job.coexpress = True
 
-                _, ext = path.splitext(filename)
-                if ext.lower() == '.soft':
-                    job.soft_file = filename
-                elif ext.lower() == '.csv':
-                    job.csv_file = filename
-                else:
-                    job.coexpress = False
+                    _, ext = path.splitext(filename)
+                    if ext.lower() == '.soft':
+                        job.soft_file = filename
+                    elif ext.lower() == '.csv':
+                        job.csv_file = filename
+                    else:
+                        job.coexpress = False
 
 
             _submit_job(redis_store, job)
