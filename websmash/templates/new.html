@@ -17,6 +17,10 @@
 <div class="tab-content">
   <div role="tabpanel" class="tab-pane active" id="nucl">
     <div>Search plant genome sequence for secondary metabolite biosynthesis gene clusters:</div>
+    <div>
+      <button class="btn btn-inverse" id="btn-sample-input">Load sample input</button>
+      <button class="btn btn-inverse" id="btn-sample-output">Open example output</button>
+    </div>
     <div class="spacer"></div>
     <div>
       <form class="form" method="POST" id="nucl-form" enctype="multipart/form-data">
@@ -125,6 +129,15 @@
     // Make sure that only NCBI accession# or uploadable file is present.
     $('#seq').change(seq_callback);
     $('#ncbi').change(clear_upload);
+
+    // Set up button actions
+    $('#btn-sample-input').click(function(){
+        $('#ncbi').val('NC_003076');
+        clear_upload();
+    });
+    $('#btn-sample-output').click(function(){
+        window.open('/precalc/results/Arabidopsis_thaliana/', '_self');
+    });
 
     $('.clusterblast').on('show.bs.collapse', function(){
         $('#clusterblast-button').removeClass('glyphicon-plus')
