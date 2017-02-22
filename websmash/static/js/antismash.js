@@ -135,7 +135,7 @@ function get_ext(file) {
 
 function is_annotated(file) {
     var ext = get_ext(file.toLowerCase());
-    var valid_exts = ['gb', 'gbk', 'genbank', 'emb', 'embl'];
+    var valid_exts = ['gb', 'gbk', 'gbff' , 'genbank', 'emb', 'embl'];
     var res = false;
     for (var i in valid_exts) {
         if (ext == valid_exts[i]) {
